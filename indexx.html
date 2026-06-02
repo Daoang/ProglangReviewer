@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Programming Languages FInals</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;700&family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-main: #0b0f19;
+            --panel-bg: rgba(22, 30, 49, 0.7);
+            --border-glow: #3b82f6;
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --neon-green: #10b981;
+            --neon-amber: #f59e0b;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--bg-main);
+            background-image: 
+                radial-gradient(circle at 15% 15%, rgba(59, 130, 246, 0.08) 0%, transparent 50%),
+                radial-gradient(circle at 85% 85%, rgba(139, 92, 246, 0.08) 0%, transparent 50%);
+            color: var(--text-primary);
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        #app-container {
+            width: 100%;
+            max-width: 850px;
+            text-align: center;
+        }
+
+        .title-banner {
+            font-size: 2rem;
+            font-weight: 800;
+            letter-spacing: -1px;
+            margin-bottom: 5px;
+            background: linear-gradient(90deg, #3b82f6, #ec4899);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .meta-counter {
+            font-family: 'Fira Code', monospace;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-bottom: 25px;
+        }
+
+        .stage-area {
+            perspective: 1000px;
+            margin-bottom: 30px;
+            width: 100%;
+            height: 380px;
+        }
+
+        .flip-card {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+        }
+
+        .flip-card.is-flipped {
+            transform: rotateY(180deg);
+        }
+
+        .card-face {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            border-radius: 24px;
+            padding: 40px;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .card-front {
+            background: linear-gradient(145deg, #131a2e, #0b0f19);
+            border-color: rgba(59, 130, 246, 0.3);
+        }
+
+        .card-back {
+            background: linear-gradient(145deg, #0a1820, #0f2b2c);
+            border-color: rgba(16, 185, 129, 0.3);
+            transform: rotateY(180deg);
+        }
+
+        .hint-text {
+            font-size: 0.8rem;
+            color: var(--border-glow);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 20px;
+            font-weight: 700;
+        }
+
+        .card-back .hint-text {
+            color: var(--neon-green);
+        }
+
+        .question-text {
+            font-size: 1.4rem;
+            font-weight: 700;
+            line-height: 1.5;
+            color: var(--text-primary);
+        }
+
+        .answer-text {
+            font-size: 1.5rem;
+            font-weight: 800;
+            line-height: 1.4;
+            color: var(--neon-green);
+            text-shadow: 0 0 15px rgba(16, 185, 129, 0.2);
+        }
+
+        .navigation-cluster {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        .control-trigger {
+            background: var(--border-glow);
+            color: white;
+            border: none;
+            padding: 14px 32px;
+            border-radius: 12px;
+            font-family: inherit;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .control-trigger:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(59, 130, 246, 0.3);
+        }
+
+        .control-trigger.secondary {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-secondary);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .control-trigger.secondary:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text-primary);
+        }
+
+        .control-trigger.warning {
+            background: rgba(245, 158, 11, 0.1);
+            color: var(--neon-amber);
+            border: 1px solid rgba(245, 158, 11, 0.3);
+        }
+
+        .control-trigger.warning:hover {
+            background: rgba(245, 158, 11, 0.2);
+            box-shadow: 0 5px 15px rgba(245, 158, 11, 0.2);
+        }
+
+        .control-trigger:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+            transform: none !important;
+            box-shadow: none !important;
+        }
+
+        #all-answers-sheet {
+            display: none;
+            text-align: left;
+            background: var(--panel-bg);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 24px;
+            padding: 35px;
+            margin-top: 20px;
+            max-height: 600px;
+            overflow-y: auto;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        .sheet-entry {
+            padding: 15px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .sheet-entry:last-child { border-bottom: none; }
+        .sheet-q { font-size: 1.05rem; font-weight: 700; color: var(--text-primary); margin-bottom: 6px; }
+        .sheet-a { font-size: 1rem; font-weight: 600; color: var(--neon-green); font-family: 'Fira Code', monospace; }
+
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 4px; }
+    </style>
+</head>
+<body>
+
+<div id="app-container">
+    <div class="title-banner">Programming Languages Final Reviewer</div>
+    <div class="meta-counter" id="meta-view">CARD <span id="display-number">1</span> OF 100</div>
+
+    <div class="stage-area" id="card-stage">
+        <div class="flip-card" id="card-element" onclick="toggleCardFlip()">
+            <div class="card-face card-front">
+                <div class="hint-text">Click card to reveal answer</div>
+                <div id="current-question-text" class="question-text"></div>
+            </div>
+            <div class="card-face card-back">
+                <div class="hint-text">Correct Answer</div>
+                <div id="current-answer-text" class="answer-text"></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="all-answers-sheet">
+        <div style="font-size: 1.3rem; font-weight: 800; color: var(--border-glow); border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 15px; margin-bottom: 15px;">
+            MASTER CODE & EXAM DIRECTORY KEY
+        </div>
+        <div id="sheet-items-container"></div>
+    </div>
+
+    <div class="navigation-cluster">
+        <button class="control-trigger secondary" id="prev-btn" onclick="navigateCard(-1)">Previous</button>
+        <button class="control-trigger secondary" id="shuffle-btn" onclick="shuffleDeck()">Shuffle Deck</button>
+        <button class="control-trigger" id="next-btn" onclick="navigateCard(1)">Next Card</button>
+        <button class="control-trigger warning" id="reveal-all-btn" onclick="toggleAnswersSheet()">Reveal All Answers</button>
+    </div>
+</div>
+
+<script>
+const programmingDataset = [
+    // --- SUBPROGRAMS & LIFECYCLES (Cards 1-25) ---
+    { q: "What is a named, self-contained block of code designed to execute a specific task within a larger program?", a: "Subprogram (also known as functions, procedures, or methods)" },
+    { q: "In Python, which keyword is explicitly utilized to declare or create a subprogram definition?", a: "def" },
+    { q: "Subprograms support which fundamental programming problem-solving approach by decomposing a program into manageable units?", a: "Divide-and-conquer approach" },
+    { q: "What is the primary process of breaking down a massive software program into smaller, isolated functional components called?", a: "Modularity" },
+    { q: "Which parameter-passing method transmits a copy of the actual parameter's value so internal mutations do not affect the caller?", a: "Pass-by-Value" },
+    { q: "Which parameter-passing mechanism passes the memory address of the argument, ensuring internal adjustments directly change the caller's data?", a: "Pass-by-Reference" },
+    { q: "What runtime transmission mechanism describes Python's parameter passing system (a hybrid of value and reference depending on data features)?", a: "Pass-by-object-reference" },
+    { q: "In Python, how is pass-by-value behavior natively simulated during parameter passing?", a: "By passing immutable data types (such as Integers)" },
+    { q: "In Python, how is pass-by-reference behavior natively simulated when transmitting arguments?", a: "By passing mutable data types (such as Lists or Dictionaries)" },
+    { q: "Which parameter-passing method treats the formal parameter as an initially empty placeholder variable to be populated and returned?", a: "Pass-by-Result" },
+    { q: "Which parameter-passing framework copies an argument value in at initialization, mutates it locally, and reassigns it back to the caller at execution termination?", a: "Pass-by-Value-Result" },
+    { q: "When a subprogram is invoked, it allocates a collection of cells containing local parameters and addresses inside which memory region?", a: "The Call Stack" },
+    { q: "What is the alternative operational name given to an individual activation record pushed onto the stack during runtime calls?", a: "Stack Frame" },
+    { q: "What specific three structural pieces of information are natively contained inside a subprogram's stack activation record?", a: "Passed parameters, local variables, and the return address" },
+    { q: "What local variable strategy allocates variables dynamically at runtime when the function is invoked, and discards them at completion?", a: "Stack-Dynamic Variables" },
+    { q: "What is the system-managed data structure that operates under last-in, first-out (LIFO) parameters to isolate recursive local states?", a: "The Call Stack" },
+    { q: "What is a primary system benefit of stack-dynamic variables' automatic memory lifecycle management?", a: "It completely prevents runtime memory leaks" },
+    { q: "Unlike stack-dynamic options, what variables reside in a fixed memory location, are allocated once, and persist values between invocations?", a: "Static Variables (or Static-Dynamic)" },
+    { q: "What programming risk accompanies static variables when deployed across asynchronous or nested paths?", a: "Unintended side effects in multithreaded or recursive environments" },
+    { q: "What internal mechanism maps variable lifecycles automatically to ensure distinct invocations do not cross-contaminate data unless passed explicitly?", a: "Data Isolation" },
+    { q: "In Python, which built-in logical statement check helps simulate local static variables inside functions?", a: "hasattr() function checking a persistent attribute on the function object" },
+    { q: "Which programming parameter category refers to the actual inputs written down by developers within a function call statement?", a: "Actual Parameters (Arguments)" },
+    { q: "Which programming parameter type acts as local bound identifiers inside a subprogram's declaration header?", a: "Formal Parameters" },
+    { q: "Python functions primary implement subprograms through structures that can accept default, keyword, and what parameters?", a: "Variable-length parameters" },
+    { q: "What happens during script execution if a function is successfully registered in memory using 'def' but never explicitly called?", a: "No output appears during execution" },
+
+    // --- LEXICAL ANALYSIS (Cards 26-50) ---
+    { q: "Which parsing engine phase scans source code characters from left to right to assemble logical code components?", a: "Lexical Analysis (Scanner)" },
+    { q: "What are the small, logically grouped elements of language structures called (e.g., keywords, numbers, punctuation)?", a: "Tokens" },
+    { q: "What are the exact character string patterns inside the source code text that form an individual token instance?", a: "Lexemes" },
+    { q: "What automation logic framework maps clean regular expressions to help a lexical analyzer recognize character tokens accurately?", a: "Deterministic Finite Automaton (DFA)" },
+    { q: "What state category within a compiler's DFA explicitly determines the terminal verification and classification of a token type?", a: "Final State" },
+    { q: "What input components are systematically stripped away by a scanner during its input preprocessing cleanup routine?", a: "Comments, whitespaces, blanks, tabs, and newlines" },
+    { q: "What specific scanner subprocess breaks up input source blocks into valid matched string series?", a: "Tokenization" },
+    { q: "What lexical analyzer activity handles the categorization of a validated token into keywords, identifiers, or operations?", a: "Token Classification" },
+    { q: "What parsing step checks string tokens against programming regulations to make sure text strings match language rule bounds?", a: "Token Validation" },
+    { q: "What output format represents the resulting production delivered by a scanner directly to a syntax analyzer?", a: "Token Stream" },
+    { q: "What sets can tokens be specified in during lexical token pattern evaluation?", a: "Alphabets, Strings, and Symbols" },
+    { q: "What is the rule constraint governing string length parameters according to the lexical design handout?", a: "The number of continuous character elements or alphabets occurring together" },
+    { q: "What components belong under non-tokens, meaning they are ignored or bypassed entirely by compilation steps?", a: "Comments, preprocessor directives, macros, blanks, tabs, and newlines" },
+    { q: "While patterns match strings to lexemes, tokens themselves are natively passed down represented as what values?", a: "Integer values" },
+    { q: "Given the assignment statement 'result = oldsum - value / 50;', what token class represents the lexeme 'result'?", a: "IDENT (Identifier)" },
+    { q: "Given the statement 'result = oldsum - value / 50;', what token class maps directly to the '=' character symbol?", a: "ASSIGN_OP (Assignment Operator)" },
+    { q: "In the line 'result = oldsum - value / 50;', what lexeme corresponds directly to the INT_LIT token code?", a: "50" },
+    { q: "In the line 'result = oldsum - value / 50;', what lexeme corresponds directly to the DIV_OP token code?", a: "/" },
+    { q: "How many valid tokens exist in the minimal syntax framework block: 'int main(){ int x, y; x=10; return 0; }'?", a: "18 valid tokens" },
+    { q: "Why are comments completely skipped or omitted when calculating a file's total valid compilation token count?", a: "Because they are classified as non-tokens by the preprocessing framework" },
+    { q: "What structural guideline determines how items inside double quotes are parsed during a print function evaluation?", a: "Everything inside a double quote is counted as a single token" },
+    { q: "How many complete individual compilation tokens are processed in the single line: 'println(\"Walking is a good exercise\");'?", a: "Five tokens" },
+    { q: "How many tokens are computed inside the declaration snippet: 'int main() { int x=15, y=40; printf(\"sum is:%d\",x+y); return 0; }'?", a: "27 tokens" },
+    { q: "Which tool or system handles the issuance of compile errors if a code string lexeme completely violates standard lexical patterns?", a: "Lexical Analyzer" },
+    { q: "Regular expressions define tokens, but what fundamental language rule requirement prevents them from tracking complete syntax accuracy?", a: "Regular expressions cannot check balancing tokens (such as matching parenthesis)" },
+
+    // --- SYNTAX ANALYSIS & PARSING (Cards 51-75) ---
+    { q: "What compiler design process checks a token stream layout against formal rules to verify code accuracy?", a: "Syntax Analysis (Parsing)" },
+    { q: "What tool maps out code hierarchical structures to form the primary terminal output of a syntax parser?", a: "Parse Tree (or Abstract Syntax Tree / AST)" },
+    { q: "What type of language grammar description handles structural balancing token requirements within a compiler layout?", a: "Context-Free Grammar (CFG)" },
+    { q: "What specific collection of items inside a context-free grammar maps out how valid strings or token streams are formed?", a: "Production Rules" },
+    { q: "What is the secondary core responsibility of a parser when an application file contains unexpected or invalid coding syntax configurations?", a: "Error Handling (detecting and flagging syntax faults, and showing where they occurred)" },
+    { q: "What data layout component records critical diagnostic details regarding symbol identities, structural scopes, and block memory sites?", a: "Symbol Table" },
+    { q: "What is the sequential process of step-by-step application of context-free grammar production rules to form valid expressions called?", a: "Derivation" },
+    { q: "During derivation steps, what dual critical compilation decisions must the parser systematically make for a sentential input?", a: "Deciding on the non-terminal to be replaced, and deciding the production rule by which it will be replaced" },
+    { q: "What parsing strategy replaces non-terminal variables from left to right by scanning across raw expression strings?", a: "Left-most Derivation" },
+    { q: "What sentential representation is explicitly produced at intermediate phases of a left-most derivation routine?", a: "Left-sentential form" },
+    { q: "What parsing technique systematically reads code inputs and replaces non-terminal elements from right to left?", a: "Right-most Derivation" },
+    { q: "What sentential string style describes the intermediate outputs generated by a right-most derivation parser?", a: "Right-sentential form" },
+    { q: "What is the structural root element from which an entire graphical parse tree expands downwards?", a: "The start symbol of the context-free grammar" },
+    { q: "Inside a graphical parse tree structure layout, what specific components must all terminal elements belong to?", a: "Leaf nodes" },
+    { q: "Inside a standard parse tree diagram, what elements do the internal interior nodes always represent?", a: "Non-terminals" },
+    { q: "What specific method of parse tree graphical traversal reproduces the original input source code string?", a: "In-order traversal" },
+    { q: "How is operator priority hierarchically tracked inside an unparsed mathematical statement parse tree diagram?", a: "The deepest sub-tree is evaluated first, giving its operator precedence over parent node operators" },
+    { q: "What error classification applies to a grammar file if it produces more than one left or right derivation tree for a string?", a: "Ambiguous Grammar" },
+    { q: "What can be said about a target application programming language if it is generated using ambiguous structural instructions?", a: "The language is inherently ambiguous" },
+    { q: "Can a universal compiler tool automatically parse, detect, and resolve text structural ambiguities within any custom language?", a: "No method can detect and remove ambiguity automatically" },
+    { q: "What two explicit developer solutions eliminate compiler ambiguity bugs inside custom context-free grammars?", a: "Re-writing the whole grammar without ambiguity, or setting and following associativity and precedence constraints" },
+    { q: "When an operator is shared between operands, what logical layout behavior resolves which operator acts on the shared data block?", a: "Precedence" },
+    { q: "What operational sequence rule acts to determine string processing paths when identical operators sit on both sides of an operand?", a: "Associativity" },
+    { q: "If a system uses left-associative tracking structures, which operator side processes the operand first?", a: "The left operator" },
+    { q: "What classification style governs evaluation order when right-associative properties determine mathematical execution?", a: "The right operator takes the operand first" },
+
+    // --- OPERATORS & VARIABLES (Cards 76-100) ---
+    { q: "Which baseline mathematical programming operations follow left-associative layout constraints natively in Python?", a: "Addition, Multiplication, Subtraction, and Division" },
+    { q: "Which basic mathematical expression structure follows right-associative rule parameters inside standard code blocks?", a: "Exponentiation (or Power operations)" },
+    { q: "How does a compiler evaluate the left-associative multi-operator numeric string statement '2 + 3 + 4'?", a: "It maps it as: (2 + 3) + 4" },
+    { q: "How does a compilation engine evaluate the right-associative expression string statement '2 ^ 3 ^ 4'?", a: "It maps it as: 2 ^ (3 ^ 4)" },
+    { q: "What mathematical priority designation model is used in Python to dictate operation order?", a: "Hierarchy of priorities" },
+    { q: "In Python's operator precedence hierarchy, what specific mathematical symbol occupies the highest priority level (Level 1)?", a: "The ** (Exponentiation) operator" },
+    { q: "In Python's precedence priority metrics, what operations sit at the absolute lowest tier (Level 4)?", a: "Binary + (Addition) and - (Subtraction)" },
+    { q: "What descriptive string of character elements identifies an abstraction of a memory cell or entity in a program?", a: "Name (or Identifier)" },
+    { q: "What standard rule constraints define a valid identifier form across almost all primary computer programming platforms?", a: "It must start with a letter followed by a string consisting of letters, digits, and underscore characters" },
+    { q: "What casing style capitalizes every single secondary word boundary within an identifier string (e.g., myFirstCode)?", a: "Camel Case (or Camel Notation)" },
+    { q: "Why was camel case given its physical name descriptor in the early programming eras?", a: "The embedded uppercase letters make it look like a camel's hump" },
+    { q: "What casing format uses exclusively lowercase character strings separated with an underscore to improve readability?", a: "Snake Case (e.g., pyt_variable or pyt_function)" },
+    { q: "What identifier convention requires every individual word starting boundary to begin with a capital letter (e.g., PythonClass)?", a: "Pascal Case" },
+    { q: "What syntax design restriction sets variable rules in PHP apart from standard languages?", a: "All variable names in PHP must begin with a dollar ($) sign" },
+    { q: "What variable character prefixes specify instance and class scopes respectively inside Ruby codebase formats?", a: "The @ symbol for instance variables, and @@ for class variables" },
+    { q: "Are names within C-based application platforms like C++ case-sensitive or case-insensitive?", a: "Case-sensitive (e.g., kind, KIND, and Kind are distinct with no connection between them)" },
+    { q: "What special category of words separate statement parts but are locked against user-defined variable redefinition?", a: "Reserved Words" },
+    { q: "What unique property configuration sextuple defines a variable's complete abstraction profile?", a: "Name, address, type, value, lifetime, and scope" },
+    { q: "What specific designation term refers to a variable's value when it sits on the right-hand side of an assignment statement?", a: "r-value" },
+    { q: "What is the structural definition for the precise timestamp or phase where an attribute links to a program entity?", a: "Binding Time" },
+    { q: "What data type binding layout requires an explicit declaration statement listing names and type specifications?", a: "Explicit Declaration" },
+    { q: "What automatic binding format links data types implicitly based on contextual usage patterns without type statements?", a: "Implicit Declaration" },
+    { q: "What variable typing property dynamically binds types during execution phase assignments in Python?", a: "Dynamic Type Binding" },
+    { q: "What is the region or range of execution statements across a script file where a variable remains visible and accessible?", a: "Scope" },
+    { q: "What sequential hierarchy governs variable scope lookups in Python according to structural rules?", a: "The LEGB Rule (Local, Enclosing, Global, Built-in)" }
+];
+
+let deck = [];
+let currentCardIndex = 0;
+let sheetViewActive = false;
+
+function shuffleArray(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+    }
+}
+
+function initReviewer() {
+    deck = programmingDataset.map(item => ({ question: item.q, answer: item.a }));
+    shuffleArray(deck);
+    displayCard();
+    populateAnswerKeySheet();
+}
+
+function displayCard() {
+    const card = document.getElementById('card-element');
+    card.classList.remove('is-flipped');
+    
+    document.getElementById('display-number').innerText = currentCardIndex + 1;
+    document.getElementById('current-question-text').innerText = deck[currentCardIndex].question;
+    document.getElementById('current-answer-text').innerText = deck[currentCardIndex].answer;
+    
+    document.getElementById('prev-btn').disabled = (currentCardIndex === 0);
+    document.getElementById('next-btn').disabled = (currentCardIndex === deck.length - 1);
+}
+
+function toggleCardFlip() {
+    document.getElementById('card-element').classList.toggle('is-flipped');
+}
+
+function navigateCard(step) {
+    currentCardIndex += step;
+    if (currentCardIndex >= 0 && currentCardIndex < deck.length) {
+        displayCard();
+    }
+}
+
+function shuffleDeck() {
+    currentCardIndex = 0;
+    shuffleArray(deck);
+    displayCard();
+}
+
+function populateAnswerKeySheet() {
+    const container = document.getElementById('sheet-items-container');
+    container.innerHTML = programmingDataset.map((item, index) => `
+        <div class="sheet-entry">
+            <div class="sheet-q">${index + 1}. ${item.q}</div>
+            <div class="sheet-a">&gt;&gt; ${item.a}</div>
+        </div>
+    `).join('');
+}
+
+function toggleAnswersSheet() {
+    const cardStage = document.getElementById('card-stage');
+    const answersSheet = document.getElementById('all-answers-sheet');
+    const metaView = document.getElementById('meta-view');
+    const prevBtn = document.getElementById('prev-btn');
+    const shuffleBtn = document.getElementById('shuffle-btn');
+    const nextBtn = document.getElementById('next-btn');
+    const toggleBtn = document.getElementById('reveal-all-btn');
+
+    if (!sheetViewActive) {
+        cardStage.style.display = 'none';
+        metaView.style.display = 'none';
+        prevBtn.style.display = 'none';
+        shuffleBtn.style.display = 'none';
+        nextBtn.style.display = 'none';
+        answersSheet.style.display = 'block';
+        toggleBtn.innerText = "Return to Flashcards";
+        sheetViewActive = true;
+    } else {
+        cardStage.style.display = 'block';
+        metaView.style.display = 'block';
+        prevBtn.style.display = 'block';
+        shuffleBtn.style.display = 'block';
+        nextBtn.style.display = 'block';
+        answersSheet.style.display = 'none';
+        toggleBtn.innerText = "Reveal All Answers";
+        sheetViewActive = false;
+        displayCard();
+    }
+}
+
+initReviewer();
+</script>
+</body>
+</html>
